@@ -1,0 +1,21 @@
+{
+  "name": "whats-gpt-firebase",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "This is Simple Node JS app to connect OpenAI GPT with Whatsapp and realtime database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.0",
+    "express": "^4.18.2",
+    "firebase": "^9.22.2",
+    "openai": "^3.3.0",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.21.0"
+  }
+}
