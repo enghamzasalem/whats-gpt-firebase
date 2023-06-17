@@ -31,7 +31,7 @@ Make sure your Firebase project has the Realtime Database enabled.
 * Set up OpenAI:
 
 5. Obtain an API key from [OpenAI](https://platform.openai.com/account/api-keys).
-Replace the placeholder myKEY in the code with your actual OpenAI API key.
+Replace the placeholder OPEN_AI_KEY in the code with your actual OpenAI API key.
 # Usage
 To run the application, use the following command:
 ```
@@ -53,7 +53,6 @@ Contributions to Whats-GPT-Firebase are welcome! If you find any issues or have 
 This project is licensed under the [MIT License](https://opensource.org/license/mit/).
 
 License Attribution:
-Developer Relations Expert: [Hamza Salem](https://enghamzasalem.com/)
+Developer Relations: [Hamza Salem](https://enghamzasalem.com/)
 
-<iframe src="https://enghamzasalem.com/" style="width: 100%; height: 100vh; border: none;"></iframe>
 
