@@ -50,7 +50,8 @@ node index.js
 * You can also use the /submit endpoint with a POST request to authenticate. Pass the phone number and prompt in the request body.
 The chat history will be stored in Firebase Realtime Database under the /links/test/{chatId} path.
 # Contributing
-this is not the main project, so if you want to contributing you should contributing your changes to the [Main Project]([https://opensource.org/license/mit/](https://github.com/enghamzasalem/whats-gpt-firebase)) By [@enghamzasalem](https://github.com/enghamzasalem/)
+this is not the main project, so if you want to contributing you should contributing your changes to the
+[Main Project](https://github.com/enghamzasalem/whats-gpt-firebase) By [@enghamzasalem](https://github.com/enghamzasalem/)
 # License
 This project is licensed under the [MIT License](https://opensource.org/license/mit/).
 
