@@ -1,7 +1,10 @@
 # Whats-GPT-Firebase
 
 <img src="images/fig1.jpg" />
-Whats-GPT-Firebase is a Node.js application that integrates the WhatsApp Web API, OpenAI's GPT-3.5 language model, and Firebase Realtime Database. It allows you to interact with a WhatsApp chatbot powered by OpenAI's GPT-3.5 model and store the chat history in Firebase.
+
+Whatsapp-GPT-Firebase-txt2speach is a Node.js application that integrates WhatsApp-Web.js, GPT-3.5 language model with Cloudlabs Api, and Firebase Realtime DB. allowing you to make a WhatsApp chatbot powered by OpenAI's GPT-3.5 to respond, and convert the answer to speach using Cloudlabs API, and store the chat history in Firebase DB.
+
+if you understand arabic you can watch the video on my channel => [Salah Bakhash](https://www.youtube.com/channel/UCFwqBlQH93pPRSeXTVTOMZw).
 
 ## Table of Contents
 - [Installation](#installation)
@@ -12,13 +15,13 @@ Whats-GPT-Firebase is a Node.js application that integrates the WhatsApp Web API
 ## Installation
 
 1. Clone the repository to your local machine:
-   ```
-   git clone https://github.com/enghamzasalem/whats-gpt-firebase.git
-   ```
+```
+ git clone https://github.com/salahbakhash/Whatsapp-GPT-Firebase-txt2speach.git
+```
 2. Navigate to the project directory:  
- ``` 
+``` 
  cd whats-gpt-firebase
- ```
+```
 3. Install the dependencies:
 ``` 
  npm install
@@ -47,8 +50,7 @@ node index.js
 * You can also use the /submit endpoint with a POST request to authenticate. Pass the phone number and prompt in the request body.
 The chat history will be stored in Firebase Realtime Database under the /links/test/{chatId} path.
 # Contributing
-Contributions to Whats-GPT-Firebase are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
-
+this is not the main project, so if you want to contributing you should contributing your changes to the [Main Project]([https://opensource.org/license/mit/](https://github.com/enghamzasalem/whats-gpt-firebase)) By [@enghamzasalem](https://github.com/enghamzasalem/)
 # License
 This project is licensed under the [MIT License](https://opensource.org/license/mit/).
 
