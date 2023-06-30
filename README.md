@@ -18,13 +18,13 @@ if you understand arabic you can watch the video on my channel => [Salah Bakhash
 1. Clone the repository to your local machine:
 
 ```
- git clone https://github.com/salahbakhash/Whatsapp-GPT-Firebase-txt2speach.git
+ git clone https://github.com/salahbakhash/Whatsapp-GPT-Firebase-Txt-To-Speech.git
 ```
 
 2. Navigate to the project directory:
 
 ```
- cd whats-gpt-firebase
+ cd Whatsapp-GPT-Firebase-Txt-To-Speech
 ```
 
 3. Install the dependencies:
@@ -63,7 +63,7 @@ node index.js
 
 # Contributing
 
-this is not the main project, so if you want to contributing you should contributing your changes to the [Main Project](<[https://opensource.org/license/mit/](https://github.com/enghamzasalem/whats-gpt-firebase)>) By [@enghamzasalem](https://github.com/enghamzasalem/)
+this is not the main project, so if you want to contributing you should contributing your changes to the [Main Project](https://github.com/enghamzasalem/whats-gpt-firebase) By [@enghamzasalem](https://github.com/enghamzasalem/)
 
 # License
 
