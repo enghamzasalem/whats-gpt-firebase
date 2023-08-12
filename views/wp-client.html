@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
           loadingDiv.innerHTML = "QR code is loading..."
-            const response = await fetch('http://localhost:3000/wp-client/'+queryParams.get("phone_number"), {
+            const response = await fetch('http://localhost:3500/wp-client/'+queryParams.get("phone_number"), {
                 method: 'POST',
                 body: formData
             });
