@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WhatsGPT</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+body, html {height: 100%}
+.bgimg {
+  background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg');
+  min-height: 100%;
+  background-position: center;
+  background-size: cover;
+}
+</style>
+</head>
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+  <div class="w3-display-topleft w3-padding-large w3-xlarge">
+  WhatsGPT
+  </div>
+  <div class="w3-display-middle">
+    <form action="/" method="post" id="wp-client">
+      <p class="w3-center">
+        <label><b>Your Prompt</b></label>
+        <textarea name="promt"  class="w3-input w3-border w3-margin-bottom"  rows="4" cols="50"></textarea>
+      </p>
+      <p class="w3-center">
+        <button type="button" id="submit-form-btn">Generate</button>
+      </p>
+    </form>
+ <center>
+    <h2  class="w3-jumbo w3-animate-top">QRCode</h2>
+    
+    <hr class="w3-border-grey" style="margin:auto;width:40%">
+    <p class="w3-center"><div><img src='' id="qr-code"/><div id="loading-div"></div></div></p>
+  </center>
+  </div>
+  <div class="w3-display-bottomleft w3-padding-large">
+    Powered by <a href="/" target="_blank">WhatsGPT</a>
+  </div>
+</div>
+
+</body>
+
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+    const form = document.getElementById('wp-client');
+    const submitButton = document.getElementById('submit-form-btn');
+    const image = document.getElementById("qr-code")
+    const loadingDiv = document.getElementById("loading-div")
+    const currentUrl = window.location.href;
+    const url = new URL(currentUrl);
+    const queryParams = url.searchParams;
+
+    submitButton.addEventListener('click', async () => {
+        const formData = new FormData(form);
+
+        try {
+          loadingDiv.innerHTML = "QR code is loading..."
+            const response = await fetch('http://localhost:3000/wp-client/'+queryParams.get("phone_number"), {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+              loadingDiv.innerHTML = ""
+                
+                const qrCode = await response.text(); // Assuming the response is an image URL
+                image.src = qrCode;
+            } else {
+                loadingDiv.innerHTML = 'Error submitting';
+            }
+        } catch (error) {
+          loadingDiv.innerHTML = 'An error occurred: ' + error.message;
+        }
+    });
+
+  
+  
+  
+  })
+
+
+</script>
+</html>
+
+    

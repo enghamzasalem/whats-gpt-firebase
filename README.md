@@ -35,12 +35,12 @@ Replace the placeholder OPEN_AI_KEY in the code with your actual OpenAI API key.
 # Usage
 To run the application, use the following command:
 ```
-node index.js
+nodemon index.js
 ```
 
 * Once the application is running, you can access it through a web browser or use the provided endpoints http://localhost:3500.
 
-* To authenticate with WhatsApp, open your browser and navigate to http://localhost:3500/authenticate/{phoneNumber}/{prompt}
+* To authenticate with WhatsApp, open your browser and navigate to http://localhost:3500/wp-client/{phoneNumber}
 
 * Replace {phoneNumber} with your WhatsApp phone number (including the country code) and {prompt} with the initial message you want to send to the chatbot.
 * A QR code will be generated, which you need to scan using the WhatsApp app on your phone. Once scanned, you will be authenticated with WhatsApp and ready to start interacting with the chatbot.
