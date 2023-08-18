@@ -1,177 +1,160 @@
-import pkg from "qrcode-terminal";
-import Whatsapp from "whatsapp-web.js";
+// Importing necessary modules
+import express from "express";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import qr2 from "qrcode";
+import qrcodeTerminal from "qrcode-terminal";
+import whatsappWeb from 'whatsapp-web.js';
+const { Client, LocalAuth } = whatsappWeb;
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, set, child } from "firebase/database";
 import { Configuration, OpenAIApi } from "openai";
-import express from "express";
-import qr2 from "qrcode";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-// import { env } from "process";
 import { config } from "dotenv";
 
-config(); // Load environment variables from .env file
+// Loading environment variables from the .env file
+config();
 
-const { Client, LocalAuth } = Whatsapp;
+// Destructuring environment variables for clarity and convenience
+const {
+    API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID,
+    STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID, PORT, OPEN_AI_KEY
+} = process.env;
+
+// Setting up path constants
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const appEx = express();
-appEx.use(express.urlencoded({ extended: true }));
-
-// TODO: Replace the following with your app's Firebase project configuration
+// Configuring Firebase
 const firebaseConfig = {
-    apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    databaseURL: process.env.DATABASE_URL,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APP_ID,
-  
-}
+    apiKey: API_KEY,
+    authDomain: AUTH_DOMAIN,
+    databaseURL: DATABASE_URL,
+    projectId: PROJECT_ID,
+    storageBucket: STORAGE_BUCKET,
+    messagingSenderId: MESSAGING_SENDER_ID,
+    appId: APP_ID,
+};
+
+// Initializing Firebase app and getting a reference to the database
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const dbRef = ref(database);
 
-const configuration = new Configuration({
-    apiKey: process.env.OPEN_AI_KEY,
-});
-
+// Setting up OpenAI configuration
+const configuration = new Configuration({ apiKey: OPEN_AI_KEY });
 const openai = new OpenAIApi(configuration);
 
-appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
-    const phoneNumber = req.params.phoneNumber;
-    const promt = req.params.promt;
-    var arr_chat = [
-        {
-            role: "system",
-            content: promt,
-        },
-    ];
+// Setting up Express server
+const appEx = express();
+appEx.use(express.urlencoded({ extended: true }));
 
-    const sessionName = `session-${phoneNumber}`;
-    const client = new Client({
-        authStrategy: new LocalAuth({ clientId: sessionName }),
-    });
+// Defining root route to serve the main page
+appEx.get("/", (req, res) => res.sendFile(`${__dirname}/index.html`));
 
-    console.log("Client is not ready to use!");
-    console.log(client);
-    client.on("qr", (qrCode) => {
-        pkg.generate(qrCode, { small: true });
-        qr2.toDataURL(qrCode, (err, src) => {
-            console.log(src);
-            if (err) res.send("Error occured");
-            res.send(`
-      <!DOCTYPE html>
-<html>
-<head>
-<title>WhatsGPT</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-<style>
-body,h1 {font-family: "Raleway", sans-serif}
-body, html {height: 100%}
-.bgimg {
-  background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg');
-  min-height: 100%;
-  background-position: center;
-  background-size: cover;
-}
-</style>
-</head>
-<body>
-
-<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-  <div class="w3-display-topleft w3-padding-large w3-xlarge">
-  WhatsGPT
-  </div>
-  <div class="w3-display-middle">
- <center>
-    <h2  class="w3-jumbo w3-animate-top">QRCode Generated</h2>
-    
-    <hr class="w3-border-grey" style="margin:auto;width:40%">
-    <p class="w3-center"><div><img src='${src}'/></div></p>
-    </center>
-  </div>
-  <div class="w3-display-bottomleft w3-padding-large">
-    Powered by <a href="/" target="_blank">WhatsGPT</a>
-  </div>
-</div>
-
-</body>
-</html>
-
-    `);
-        });
-    });
-
-    client.on("ready", () => {
-        console.log("Client is ready!");
-    });
-
-    client.initialize();
-    client.on("message", async (message) => {
-        const chat = await message.getChat();
-        console.log(chat.id.user);
-        var userId = chat.id.user + "";
-        console.log(userId);
-        console.log(arr_chat);
-        set(ref(database, "links/test/" + chat.id.user), {
-            messages: arr_chat,
-        });
-        // const starCountRef = ref(database, 'links/jo/'+chat.id.user);
-        get(child(dbRef, "/links/test/" + chat.id.user))
-            .then(async (snapshot) => {
-                if (snapshot.exists()) {
-                    console.log(snapshot.val());
-                    const data = await snapshot.val();
-                    console.log(data.messages);
-                    arr_chat = data.messages;
-                    arr_chat.push({
-                        role: "user",
-                        content: message.body,
-                    });
-                    console.log(arr_chat);
-                    set(ref(database, "links/test/" + chat.id.user), {
-                        messages: arr_chat,
-                    });
-                    const completion = await openai.createChatCompletion({
-                        model: "gpt-3.5-turbo",
-                        messages: arr_chat,
-                    });
-                    console.log(completion.data.choices[0].message);
-                    //   const completion =  await model.chat_completion(arr_chat)
-                    console.log(completion.data.choices[0].message.content);
-                    message.reply(completion.data.choices[0].message.content);
-                    arr_chat.push({
-                        role: "system",
-                        content: completion.data.choices[0].message.content,
-                    });
-                    console.log(arr_chat);
-                    set(ref(database, "/links/test/" + chat.id.user), {
-                        messages: arr_chat,
-                    });
-                } else {
-                    console.log("No data available");
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    });
-});
+// Route to handle form submission and initiate WhatsApp authentication
 appEx.post("/submit", (req, res) => {
-    console.log(req.body);
-    const message = req.body.message;
-    const phoneNumber = req.body.phoneNumber;
-    res.redirect("/authenticate/" + phoneNumber + "/" + message);
+    const { message, phoneNumber } = req.body;
+    res.redirect(`/authenticate/${phoneNumber}/${message}`);
 });
-appEx.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+
+// Route to handle WhatsApp authentication and QR code generation
+appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
+    const { phoneNumber, promt } = req.params;
+    initializeClient(phoneNumber, promt, res);
 });
-appEx.listen(process.env.PORT, function () {
-    console.log("Example app listening on port "+process.env.PORT+"!");
-});
+
+// Starting the Express server
+appEx.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
+
+// Function to set up WhatsApp client, listen for QR code, and handle incoming messages
+function initializeClient(phoneNumber, promt, res) {
+    const arr_chat = [{ role: "system", content: promt }];
+    const sessionName = `session-${phoneNumber}`;
+    const client = new Client({ authStrategy: new LocalAuth({ clientId: sessionName }) });
+
+    // Listener for QR code generation
+    client.on("qr", (qrCode) => generateQR(qrCode, res));
+    // Listener to check if client is ready
+    client.on("ready", () => console.log("Client is ready!"));
+    client.initialize();
+    // Listener to handle incoming messages
+    client.on("message", async (message) => handleClientMessage(message, arr_chat));
+}
+
+// Function to generate and display the QR code for WhatsApp authentication
+function generateQR(qrCode, res) {
+    qrcodeTerminal.generate(qrCode, { small: true });
+    qr2.toDataURL(qrCode, (err, src) => {
+        if (err) return res.send("Error occurred");
+        res.send(generateQRHtml(src));
+    });
+}
+
+// Function to generate HTML content for displaying the QR code
+function generateQRHtml(src) {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>WhatsApp Authentication</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <h2>Scan the QR Code with WhatsApp</h2>
+        <img src='${src}' alt='WhatsApp QR Code'>
+        <p>After scanning, return to the chat.</p>
+    </body>
+    </html>
+    `;
+}
+
+// Function to handle incoming WhatsApp messages, interact with OpenAI and Firebase
+async function handleClientMessage(message, arr_chat) {
+    const chat = await message.getChat();
+    const userId = chat.id.user;
+
+    // Checking for special commands
+    if (message.body === '/help') {
+        const helpMessage = "List of commands:\n/help - Show list of commands\n/info - Get details about this bot";
+        message.reply(helpMessage);
+        return;  // Exit the function after replying
+    }
+
+    if (message.body === '/info') {
+        const infoMessage = "This bot is powered by OpenAI's GPT-3 model. It's designed to assist users by answering queries and providing information.";
+        message.reply(infoMessage);
+        return;  // Exit the function after replying
+    }
+
+    // Retrieve previous chat messages from Firebase
+    try {
+        const snapshot = await get(child(dbRef, `/links/test/${userId}`));
+        if (snapshot.exists()) {
+            arr_chat = snapshot.val().messages || arr_chat;
+        }
+    } catch (error) {
+        console.error("Error reading from Firebase:", error);
+    }
+
+    // Add new message from the user to the chat array
+    arr_chat.push({ role: "user", content: message.body });
+
+    // Interact with OpenAI
+    try {
+        const completion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: arr_chat
+        });
+        const aiResponse = completion.data.choices[0].message.content;
+        message.reply(aiResponse);
+        
+        // Add AI's response to the chat array
+        arr_chat.push({ role: "assistant", content: aiResponse });
+        
+        // Store updated chat in Firebase
+        await set(ref(database, `/links/test/${userId}`), { messages: arr_chat });
+    } catch (error) {
+        console.error("Error interacting with OpenAI:", error);
+    }
+}
