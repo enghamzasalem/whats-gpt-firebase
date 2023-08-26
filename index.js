@@ -9,6 +9,8 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 // import { env } from "process";
 import { config } from "dotenv";
+import path from "path";
+import generateHTMLCodeWithSrc from "./data.js";
 
 config(); // Load environment variables from .env file
 
@@ -18,7 +20,7 @@ const __dirname = dirname(__filename);
 
 const appEx = express();
 appEx.use(express.urlencoded({ extended: true }));
-
+appEx.use(express.static(path.join(__dirname, 'public')));
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
@@ -62,49 +64,7 @@ appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
         qr2.toDataURL(qrCode, (err, src) => {
             console.log(src);
             if (err) res.send("Error occured");
-            res.send(`
-      <!DOCTYPE html>
-<html>
-<head>
-<title>WhatsGPT</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-<style>
-body,h1 {font-family: "Raleway", sans-serif}
-body, html {height: 100%}
-.bgimg {
-  background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg');
-  min-height: 100%;
-  background-position: center;
-  background-size: cover;
-}
-</style>
-</head>
-<body>
-
-<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-  <div class="w3-display-topleft w3-padding-large w3-xlarge">
-  WhatsGPT
-  </div>
-  <div class="w3-display-middle">
- <center>
-    <h2  class="w3-jumbo w3-animate-top">QRCode Generated</h2>
-    
-    <hr class="w3-border-grey" style="margin:auto;width:40%">
-    <p class="w3-center"><div><img src='${src}'/></div></p>
-    </center>
-  </div>
-  <div class="w3-display-bottomleft w3-padding-large">
-    Powered by <a href="/" target="_blank">WhatsGPT</a>
-  </div>
-</div>
-
-</body>
-</html>
-
-    `);
+            res.send(generateHTMLCodeWithSrc(src));
         });
     });
 
