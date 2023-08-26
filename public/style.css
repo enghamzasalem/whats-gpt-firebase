@@ -1,0 +1,17 @@
+body,h1 
+{
+    font-family: "Raleway", sans-serif
+}
+
+body, html 
+{
+    height: 100%
+}
+
+.bgimg 
+{
+    background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg');
+    min-height: 100%;
+    background-position: center;
+    background-size: cover;
+}
