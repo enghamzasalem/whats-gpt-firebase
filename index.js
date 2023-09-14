@@ -1,14 +1,14 @@
-import pkg from "qrcode-terminal";
-import Whatsapp from "whatsapp-web.js";
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get, set, child } from "firebase/database";
-import { Configuration, OpenAIApi } from "openai";
-import express from "express";
 import qr2 from "qrcode";
+import pkg from "qrcode-terminal";
+import express from "express";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 // import { env } from "process";
 import { config } from "dotenv";
+import { Configuration, OpenAIApi } from "openai";
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, get, set, child } from "firebase/database";
+import Whatsapp from "whatsapp-web.js";
 
 config(); // Load environment variables from .env file
 
@@ -20,49 +20,55 @@ const appEx = express();
 appEx.use(express.urlencoded({ extended: true }));
 
 // TODO: Replace the following with your app's Firebase project configuration
+// Firebase project configuration
 const firebaseConfig = {
-    apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    databaseURL: process.env.DATABASE_URL,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APP_ID,
-  
-}
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  databaseURL: process.env.DATABASE_URL,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
+};
+
+// Initialize Firebase app and database
+const firebaseApp = initializeApp(firebaseConfig);
+const database = getDatabase(firebaseApp);
 const dbRef = ref(database);
 
-const configuration = new Configuration({
-    apiKey: process.env.OPEN_AI_KEY,
+// Initialize OpenAI configuration
+const openaiConfig = new Configuration({
+  apiKey: process.env.OPEN_AI_KEY,
 });
+const openai = new OpenAIApi(openaiConfig);
 
-const openai = new OpenAIApi(configuration);
+// Express routes
+appEx.get("/authenticate/:phoneNumber/:promt", async (req, res) => {
+  const phoneNumber = req.params.phoneNumber;
+  const prompt = req.params.promt;
+  var arr_chat = [
+    {
+      role: "system",
+      content: prompt,
+    },
+  ];
 
-appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
-    const phoneNumber = req.params.phoneNumber;
-    const promt = req.params.promt;
-    var arr_chat = [
-        {
-            role: "system",
-            content: promt,
-        },
-    ];
+  const sessionName = `session-${phoneNumber}`;
+  const client = new Client({
+    authStrategy: new LocalAuth({ clientId: sessionName }),
+  });
 
-    const sessionName = `session-${phoneNumber}`;
-    const client = new Client({
-        authStrategy: new LocalAuth({ clientId: sessionName }),
-    });
+  console.log("Client is not ready to use!");
+  console.log(client);
 
-    console.log("Client is not ready to use!");
-    console.log(client);
-    client.on("qr", (qrCode) => {
-        pkg.generate(qrCode, { small: true });
-        qr2.toDataURL(qrCode, (err, src) => {
-            console.log(src);
-            if (err) res.send("Error occured");
-            res.send(`
+  client.on("qr", (qrCode) => {
+    pkg.generate(qrCode, { small: true });
+    qr2.toDataURL(qrCode, (err, src) => {
+      console.log(src);
+      if (err) {
+        res.send("Error occured");
+      } else {
+        res.send(`
       <!DOCTYPE html>
 <html>
 <head>
@@ -104,74 +110,78 @@ body, html {height: 100%}
 </body>
 </html>
 
-    `);
-        });
+        `);
+      }
     });
+  });
 
-    client.on("ready", () => {
-        console.log("Client is ready!");
+  client.on("ready", () => {
+    console.log("Client is ready!");
+  });
+
+  client.initialize();
+  client.on("message", async (message) => {
+    const chat = await message.getChat();
+    console.log(chat.id.user);
+    var userId = chat.id.user + "";
+    console.log(userId);
+    console.log(arr_chat);
+    set(ref(database, "links/test/" + chat.id.user), {
+      messages: arr_chat,
     });
-
-    client.initialize();
-    client.on("message", async (message) => {
-        const chat = await message.getChat();
-        console.log(chat.id.user);
-        var userId = chat.id.user + "";
-        console.log(userId);
-        console.log(arr_chat);
-        set(ref(database, "links/test/" + chat.id.user), {
+    // const starCountRef = ref(database, 'links/jo/'+chat.id.user);
+    get(child(dbRef, "/links/test/" + chat.id.user))
+      .then(async (snapshot) => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+          const data = await snapshot.val();
+          console.log(data.messages);
+          arr_chat = data.messages;
+          arr_chat.push({
+            role: "user",
+            content: message.body,
+          });
+          console.log(arr_chat);
+          set(ref(database, "links/test/" + chat.id.user), {
             messages: arr_chat,
-        });
-        // const starCountRef = ref(database, 'links/jo/'+chat.id.user);
-        get(child(dbRef, "/links/test/" + chat.id.user))
-            .then(async (snapshot) => {
-                if (snapshot.exists()) {
-                    console.log(snapshot.val());
-                    const data = await snapshot.val();
-                    console.log(data.messages);
-                    arr_chat = data.messages;
-                    arr_chat.push({
-                        role: "user",
-                        content: message.body,
-                    });
-                    console.log(arr_chat);
-                    set(ref(database, "links/test/" + chat.id.user), {
-                        messages: arr_chat,
-                    });
-                    const completion = await openai.createChatCompletion({
-                        model: "gpt-3.5-turbo",
-                        messages: arr_chat,
-                    });
-                    console.log(completion.data.choices[0].message);
-                    //   const completion =  await model.chat_completion(arr_chat)
-                    console.log(completion.data.choices[0].message.content);
-                    message.reply(completion.data.choices[0].message.content);
-                    arr_chat.push({
-                        role: "system",
-                        content: completion.data.choices[0].message.content,
-                    });
-                    console.log(arr_chat);
-                    set(ref(database, "/links/test/" + chat.id.user), {
-                        messages: arr_chat,
-                    });
-                } else {
-                    console.log("No data available");
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    });
+          });
+          const completion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: arr_chat,
+          });
+          console.log(completion.data.choices[0].message);
+          //   const completion =  await model.chat_completion(arr_chat)
+          console.log(completion.data.choices[0].message.content);
+          message.reply(completion.data.choices[0].message.content);
+          arr_chat.push({
+            role: "system",
+            content: completion.data.choices[0].message.content,
+          });
+          console.log(arr_chat);
+          set(ref(database, "/links/test/" + chat.id.user), {
+            messages: arr_chat,
+          });
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
 });
+
 appEx.post("/submit", (req, res) => {
-    console.log(req.body);
-    const message = req.body.message;
-    const phoneNumber = req.body.phoneNumber;
-    res.redirect("/authenticate/" + phoneNumber + "/" + message);
+  console.log(req.body);
+  const message = req.body.message;
+  const phoneNumber = req.body.phoneNumber;
+  res.redirect("/authenticate/" + phoneNumber + "/" + message);
 });
+
 appEx.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+  res.sendFile(__dirname + "/index.html");
 });
+
 appEx.listen(process.env.PORT, function () {
-    console.log("Example app listening on port "+process.env.PORT+"!");
+  console.log("Example app listening on port " + process.env.PORT + "!");
 });
