@@ -1,99 +1,95 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title>WhatsGPT</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Raleway"
-    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" />\
+    <h1>Test</h1>
     <style>
-      body,
-      h1 {
-        font-family: "Raleway", sans-serif;
-      }
-      body,
-      html {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      .bgimg {
-        background-image: url("https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg");
-        min-height: 100%;
-        background-position: center;
-        background-size: cover;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .container {
-        padding: 20px;
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        width: 80%;
-        max-width: 400px;
-      }
-      .center {
-        text-align: center;
-      }
-      .submit-button {
-        display: block;
-        margin: 0 auto;
-        width: 100px;
-        border-radius: 5px;
-      }
-      .w3-input {
-        border-radius: 5px;
-      }
-      .powered-by {
-        position: absolute;
-        bottom: 0;
-        left: 10px;
-        padding: 10px;
-        font-size: 14px;
-      }
+        body,
+        h1 {
+            font-family: "Raleway", sans-serif;
+        }
+        
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .bgimg {
+            background-image: url("https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg");
+            min-height: 100%;
+            background-position: center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .submit-button {
+            display: block;
+            margin: 0 auto;
+            width: 100px;
+            border-radius: 5px;
+        }
+        
+        .w3-input {
+            border-radius: 5px;
+        }
+        
+        .powered-by {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            padding: 10px;
+            font-size: 14px;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="bgimg">
-      <div class="container w3-text-black">
-        <h1 class="center w3-jumbo w3-animate-top" style="margin-left: -20px">
-          WhatsGPT Connector
-        </h1>
-        <form action="/submit" method="post">
-          <div class="w3-margin-bottom">
-            <label for="phoneNumber"><b>Your Phone:</b></label>
-            <input
-              id="phoneNumber"
-              name="phoneNumber"
-              class="w3-input w3-border"
-              type="text"
-              required
-            />
-          </div>
-          <div class="w3-margin-bottom">
-            <label for="message"><b>Your Prompt:</b></label>
-            <textarea
-              id="message"
-              name="message"
-              class="w3-input w3-border"
-              rows="4"
-              required
-            ></textarea>
-          </div>
-          <div class="center">
-            <button class="w3-btn w3-blue submit-button" type="submit">
+        <div class="container w3-text-black">
+            <h1 class="center w3-jumbo w3-animate-top" style="margin-left: -20px">
+                WhatsGPT Connector
+            </h1>
+            <form action="/submit" method="post">
+                <div class="w3-margin-bottom">
+                    <label for="phoneNumber"><b>Your Phone:</b></label>
+                    <input id="phoneNumber" name="phoneNumber" class="w3-input w3-border" type="text" required />
+                </div>
+                <div class="w3-margin-bottom">
+                    <label for="message"><b>Your Prompt:</b></label>
+                    <textarea id="message" name="message" class="w3-input w3-border" rows="4" required></textarea>
+                </div>
+                <div class="center">
+                    <button class="w3-btn w3-blue submit-button" type="submit">
               Submit
             </button>
-          </div>
-        </form>
-      </div>
-      <div class="powered-by w3-text-white">
-        Powered by <a href="/" target="_blank">WhatsGPT</a>
-      </div>
+                </div>
+            </form>
+        </div>
+        <div class="powered-by w3-text-white">
+            Powered by <a href="/" target="_blank">WhatsGPT</a>
+        </div>
     </div>
-  </body>
+</body>
+
 </html>
